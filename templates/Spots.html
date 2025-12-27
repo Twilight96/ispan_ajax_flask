@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <style>
+        #div1 {
+            position: absolute;
+            top: calc(100% + 4px);
+            /* 放在 input 下面一點 */
+            left: 0;
+            z-index: 1000;
+            /* 讓它出現在其他元件上層 */
+            width: 100%;
+            /* 跟 input 一樣寬 */
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    {% include '_navbar.html' %}
+
+
+    <div class="container mt-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <nav class="mx-auto">
+                <ul class="pagination">
+
+                </ul>
+            </nav>
+            <div class="ms-auto input-wrapper">
+                <input id="InputSearch" type="search" class="form-control" placeholder="景點搜尋" />
+                <!-- <input id="InputSearch" type="search" onkeyup="search(event)" class="form-control" placeholder="景點搜尋" /> -->
+                <div class="list-group" id="div1">
+
+                </div>
+            </div>
+        </div>
+        <div id="divSpots" class="row row-cols-1 row-cols-md-3 g-4">
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+    <script>
+        const ulPagination = document.querySelector('.pagination');
+        const div1 = document.querySelector('#divSpots');
+        const divList = document.querySelector('#div1');
+        const inpSearch = document.querySelector('#InputSearch');
+
+        const search_params = {
+            "keyword": "公園",
+            "category_id": 0,
+            "page": 1,
+            "per_page": 9,
+            "sort_by": "SpotId",
+            "sort_order": "asc"
+        }
+
+        inpSearch.addEventListener('input', async (event) => {
+            console.log(event.target);
+            const apiUrl1 = 'http://127.0.0.1:5000/api/title'
+            const url = `${apiUrl1}?keyword=${event.target.value}`;
+            const response = await fetch(url);
+            const titles = await response.json();
+
+            const htmlTitles = titles.map(title => `<button onclick="clickHandler('${title}')" type="button" class="list-group-item  list-group-item-action">${title}</button>`);
+            divList.innerHTML = htmlTitles.join('');
+        })
+
+        const loadDatas = async () => {
+            const queryString = new URLSearchParams(search_params).toString();
+
+            const apiUrl = `http://127.0.0.1:5000/api/spots?${queryString}`
+            const response = await fetch(apiUrl);
+            const datas = await response.json();
+
+            pagination(datas.total_pages);
+
+            const cards = datas.data.map(spot => {
+                const { SpotId, SpotTitle, Address, SpotDescription, SpotImage } = spot;
+                return (
+                    `<div class="col">
+                        <div class="card">
+                            <img src="${SpotImage}" class="card-img-top" alt="${SpotTitle}" />
+                            <div class="card-body">
+                                <h5 class="card-title">${SpotId} ${SpotTitle}</h5>
+                                <p class="card-text">${SpotDescription.substring(0, 100)}</p>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-body-secondary">${Address}</small>
+                            </div>
+                        </div>
+                    </div>
+                `)
+            })
+
+            div1.innerHTML = cards.join('');
+        }
+
+        const pageChange = page => {
+            search_params.page = page;
+            loadDatas();
+        }
+
+        const clickHandler = title => {
+            inpSearch.value = title;
+            divList.innerHTML = '';
+        }
+        inpSearch.addEventListener('keyup', event => {
+            if (event.which === 13) {
+                search_params.keyword = event.target.value;
+                search_params.page = 1;
+                loadDatas();
+            }
+        })
+        // const search = event => {
+
+        //     if (event.which === 13) {
+        //         search_params.keyword = event.target.value;
+        //         search_params.page = 1;
+        //         loadDatas();
+        //     }
+        // }
+
+
+        //建立分頁按鈕
+        const pagination = pages => {
+            let liPage = '';
+            for (let i = 1; i <= pages; i++) {
+                if (i > 10) break;
+                if (search_params.page === i) {
+                    liPage += ` <li class="page-item active" onclick="pageChange(${i})"><a class="page-link" href="#">${i}</a></li>`
+                } else {
+                    liPage += ` <li class="page-item" onclick="pageChange(${i})"><a class="page-link" href="#">${i}</a></li>`
+                }
+
+            }
+            ulPagination.innerHTML = liPage;
+        }
+        loadDatas();
+    </script>
+</body>
+
+</html>

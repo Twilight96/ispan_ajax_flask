@@ -13,8 +13,7 @@ class MembersResource(Resource):
     def get(self):
         """讀取所有會員"""
         members = Member.query.all()
-        # print (members[0].__dict__)
-        # # return members, 200
+      
         return [{
             "MemberId": m.MemberId, 
             "Name": m.Name, 

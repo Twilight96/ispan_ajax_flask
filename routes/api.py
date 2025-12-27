@@ -6,7 +6,7 @@ from resources.items_api import Items, Item
 from resources.member_api import MembersResource, MemberResource, MemberExistCheck
 from resources.address_api import  CityResource, DistrictResource, RoadResource
 from resources.demo_api import QueryStringDemo, PathDemo, FormDataDemo, JsonDemo
-
+from resources.spot_api import Spots, SpotCategoryStats, SpotsByDistrict, SpotTitleSearch
 
 
 api_bp = Blueprint('api', __name__)
@@ -29,13 +29,18 @@ api.add_resource(RoadResource, '/roads')
 api.add_resource(QueryStringDemo, '/demo/query')
 api.add_resource(PathDemo, '/demo/path/<string:name>/<int:age>')
 api.add_resource(FormDataDemo, '/demo/form')
-api.add_resource(JsonDemo, '/demo/json')    
+api.add_resource(JsonDemo, '/demo/json')  
+
+api.add_resource(Spots, '/spots')
+api.add_resource(SpotCategoryStats, '/categories')
+api.add_resource(SpotsByDistrict, '/spot-district')
+
 
 # 集合操作 (所有會員)
 api.add_resource(MembersResource, '/members')
     
 # 單體操作 (特定 ID)
-api.add_resource(MemberResource, '/member/<int:id>')
+api.add_resource(MemberResource, '/members/<int:id>')
     
 # 特殊功能 (姓名檢查)
 api.add_resource(MemberExistCheck, '/member/check/<string:name>')

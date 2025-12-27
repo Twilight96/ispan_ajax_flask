@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+
+<body>
+    {% include '_navbar.html' %}
+    <div class="container mt-3">
+        <select id="selectCity">
+
+        </select>
+        <div id="map" style="height: 500px; width:800px"></div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+    <script>
+        const selCity = document.querySelector('#selectCity');
+
+        (async () => {
+
+            const apiUrl = 'http://127.0.0.1:5000/api/districts?city=臺北市';
+            const response = await fetch(apiUrl);
+            const datas = await response.json();
+            const opts = datas.map(city => `<option>${city.substring(3, city.length)}</option>`);
+            selCity.innerHTML = opts.join("");
+
+            loadMap();
+        })();
+
+
+        let map;
+        let markerLayer;
+
+        const initMap = () => {
+            map = L.map('map').setView([25.05, 121.5], 13); // 初始預設中心點
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+            markerLayer = L.layerGroup().addTo(map);
+        }
+
+        const renderSpotsOnMap = spots => {
+            if (!map) initMap();
+            markerLayer.clearLayers();
+
+            if (!spots || spots.length === 0) return;
+
+            const bounds = [];
+
+            spots.forEach(spot => {
+                const { title, lat, lng } = spot;
+                //.bindPopup(title)
+                const marker = L.marker([lat, lng]).bindTooltip(title);
+                markerLayer.addLayer(marker);
+                bounds.push([lat, lng]);
+            });
+
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
+            }
+        }
+
+
+        const loadMap = async () => {
+            const apiUrl = `http://127.0.0.1:5000/api/spot-district?district=${selCity.value}`;
+            const response = await fetch(apiUrl);
+            const datas = await response.json();
+            renderSpotsOnMap(datas);
+            console.log(datas)
+
+            // let map;
+            // if (map) {
+            //     map.remove();  // 💣 刪除 Leaflet map 實例，解除綁定與事件
+            //     map = null;
+            // }
+
+
+
+            // const avgLat = datas.reduce((sum, s) => sum + s.lat, 0) / datas.length;
+            // const avgLng = datas.reduce((sum, s) => sum + s.lng, 0) / datas.length;
+
+            // map = L.map('map').setView([avgLat, avgLng], 14);
+            // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+
+
+            // datas.forEach(spot => {
+            //     L.marker([spot.lat, spot.lng])
+            //         .addTo(map)
+            //         .bindPopup(spot.title);
+
+            // })
+
+
+
+        }
+        selCity.addEventListener('change', loadMap);
+    </script>
+</body>
+
+</html>

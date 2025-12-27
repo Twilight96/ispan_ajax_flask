@@ -21,3 +21,17 @@ def members():
 @page_bp.route('/demo')
 def demo():
     return render_template('demo.html') 
+
+@page_bp.route('/spots')
+def spot():
+    return render_template('spots.html')
+
+@page_bp.route('/barchart')
+def barchart():
+    return render_template('barchart.html')
+
+@page_bp.route('/map')
+def map():
+    return render_template('map.html')
+
+
