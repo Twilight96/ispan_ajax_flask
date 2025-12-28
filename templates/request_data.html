@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-tw">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajax_Flask 專案</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+    {% include '_navbar.html' %}
+    <div class="container mt-3">
+        <h2 class="display-6 fw-bold text-secondary mb-4 pb-2 border-bottom">
+            <i class="bi bi-image-fill me-2"></i>透過 fetch() 呼叫 api 時還需要傳遞資料給 api，api 又要如何接收這些資料？
+        </h2>
+        <button id="buttonQuery" class="btn btn-primary mb-3">透過 URL QueryString 傳遞資料</button>
+        <button id="buttonPath" class="btn btn-primary mb-3">透過 URL Path 傳遞資料</button>
+        <button id="buttonForm" class="btn btn-primary mb-3">資料包在 FormData 中傳遞</button>
+        <button id="buttonJson" class="btn btn-primary mb-3">資料包在 JSON 中傳遞 </button>
+
+        <h2 class="display-6 fw-bold text-secondary my-4 pb-2 border-bottom">
+            <i class="bi bi-image-fill me-2"></i>上傳圖片
+        </h2>
+        <div class="input-group my-3">
+            <input type="file" id="fileInput" class="form-control" accept=".jpg, .jpeg, .png, .gif">
+            <button id="buttonUpload" class="btn btn-primary" type="button">檔案上傳</button>
+        </div>
+
+        <div class="mt-3">
+            <img id="img1" class="img-fluid rounded border shadow-sm" style="width: 300px; height: auto;"
+                src="static/images/empty.png" />
+        </div>
+        <div id="divInfo" class="alert alert-info mt-5"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"
+        crossorigin="anonymous"></script>
+    <script>
+        const btnQuery = document.querySelector('#buttonQuery');
+        const btnPath = document.querySelector('#buttonPath');
+        const btnForm = document.querySelector('#buttonForm');
+        const btnJson = document.querySelector('#buttonJson');
+        const btnUpload = document.querySelector('#buttonUpload');
+        const fileInput = document.querySelector('#fileInput');
+
+        const divInfo = document.querySelector('#divInfo');
+        const theImg = document.querySelector('#img1');
+
+        btnQuery.addEventListener('click', async () => {
+
+        });
+
+        btnPath.addEventListener('click', async () => {
+
+        });
+
+        btnForm.addEventListener('click', async () => {
+
+        });
+
+        btnJson.addEventListener('click', async () => {
+            const payload = {
+                name: 'Steve',
+                age: 30
+            };
+        });
+
+
+
+        //檔案上傳
+        btnUpload.addEventListener('click', async () => {
+
+        })
+
+
+        //預覽圖片
+        fileInput.addEventListener('change', event => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = event => {
+                theImg.src = event.target.result;
+            };
+            reader.readAsDataURL(file);  // 將檔案轉為 base64 URI
+
+        })
+    </script>
+</body>
+
+</html>

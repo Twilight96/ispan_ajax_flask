@@ -2,7 +2,7 @@
 1. 登入你的 GitHub 帳號。
 2. 在本專案頁面的右上方，找到並點擊 「Fork」 按鈕。
 3. 選擇你的個人帳號作為目的地。
-4. （選擇性）你可以修改 Repository name，例如加上你的學號或姓名。
+4. （選擇性）你可以修改 Repository name。
 5. 點擊 Create fork。
 
 ### 將專案 Clone 到本地電腦

@@ -1,5 +1,7 @@
-from flask import request
+from flask import request, abort
 from flask_restful import Resource
+import os, uuid
+from werkzeug.utils import secure_filename
 
 class QueryStringDemo(Resource):
     def get(self):
@@ -32,3 +34,36 @@ class JsonDemo(Resource):
         age = data.get('age')
         
         return {"method": "JSON", "received": data}, 201
+    
+UPLOAD_FOLDER = os.path.join('static', 'uploads')
+
+class ImageUploadDemo(Resource):
+    def get(self):
+        pass
+    
+    def post(self):
+        # 取得上傳的圖片，image 是formdata中的欄位名稱
+        image = request.files.get('image')
+
+        # 如果 image 不存在，或者 檔名是空的
+        if not image or image.filename == '':
+            abort(400, description="請選擇圖片檔案")
+
+        original_filename = secure_filename(image.filename)
+        ext = original_filename.rsplit('.', 1)[1].lower() if '.' in original_filename else 'jpg'
+
+        # 允許的副檔名集合
+        ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+        if ext not in ALLOWED_EXTENSIONS:
+            abort(400, description="只能上傳圖片")
+
+        # 產生全新的 UUID 檔名
+        new_filename = f"{uuid.uuid4().hex}.{ext}"
+
+        filepath = os.path.join(UPLOAD_FOLDER, new_filename)
+        image.save(filepath)
+
+        return {
+            'message': '檔案上傳成功',
+            'url': f'{UPLOAD_FOLDER}\{new_filename}'
+        }

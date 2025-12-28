@@ -10,9 +10,9 @@ def index():
 def json():
     return render_template('json.html')
 
-@page_bp.route('/image')
+@page_bp.route('/response_body')
 def image():
-    return render_template('image.html')
+    return render_template('response_body.html')
 
 @page_bp.route('/address')
 def address():
@@ -22,9 +22,9 @@ def address():
 def members():
     return render_template('members.html')
 
-@page_bp.route('/demo')
+@page_bp.route('/request_data')
 def demo():
-    return render_template('demo.html') 
+    return render_template('request_data.html')
 
 @page_bp.route('/spots')
 def spot():
