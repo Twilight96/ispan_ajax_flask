@@ -3,12 +3,15 @@ from flask import make_response, send_file, abort
 import time, os
 class HelloWorld(Resource):
     def get(self):
-        # time.sleep(5)  # 模擬延遲
+        time.sleep(5)  # 模擬延遲
         return {'message':'Hello, RESTful API!!'},200
     
 class TextResource(Resource):
     def get(self):
-        return "RESTful API"
+        response = make_response("RESTful API", 200)
+        response.mimetype = "text/plain"
+        return response
+        # return "RESTful API"
     
 class ImageResource(Resource):
     def get(self):

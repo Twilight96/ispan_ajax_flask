@@ -21,7 +21,7 @@
         <div class="container mt-5">
             <!-- <div class="row justify-content-center"> -->
             <button id="buttonStart" class="btn btn-primary">Ajax 開始</button>
-            <button id="buttonStart" class="btn btn-primary">Ajax 結束</button>
+            <button id="buttonEnd" class="btn btn-primary">Ajax 結束</button>
             <img id="img1" src="static/images/Loading.gif" style="display: none;" alt="載入中..." />
 
 
@@ -34,6 +34,106 @@
         const divInfo = document.querySelector('#divInfo');
         const imgLoader = document.querySelector('#img1');
         const btnStart = document.querySelector('#buttonStart');
+        const btnEnd = document.querySelector('#buttonEnd');
+
+        // JS 的正常函式寫法 function hi(a) {}
+        // 簡易寫法 () => {} 、 (a,b) => {} 、 a => {}
+
+        let abortController = null;
+
+        btnStart.addEventListener('click', async () => {
+            const apiUrl = 'http://127.0.0.1:5000/api/hello';
+
+            // 停止 fetch() 的執行，需要先建立一個 AbortController 物件
+            abortController = new AbortController();
+            const signal = abortController.signal; //產生一個訊號
+
+            // 3秒內沒有回傳結果就終止fetch的執行
+            const timer = setTimeout(() => {
+                abortController.abort('api 執行逾時');
+            }, 3000)
+
+            try {
+                imgLoader.style.display = 'inline' //顯示執行中的圖示
+                btnStart.disabled = true //停用按鈕功能
+
+                //有可能發生錯誤
+                //async await
+                // const response = await fetch(apiUrl);
+                const response = await fetch(apiUrl, { signal }); //把訊號放進fetch()中，之後就可以停止fetch()了
+
+                //先確認 ok 為 true
+                if (!response.ok) throw new Error('有錯誤，無法取得資料!!');
+
+                const data = await response.json();
+                divInfo.innerHTML = `<h2>${data.message}</h2>`;
+
+                // //先確認 ok 為 true
+                // if (response.ok) {
+                //     //再確認格式是否正確
+                //     const contentType = response.headers.get('Content-Type');
+                //     if (contentType && contentType.includes('application/json')) {
+                //         const data = await response.json();
+                //         divInfo.innerHTML = `<h2>${data.message}</h2>`;
+                //     } else {
+                //         console.log('回傳資料格式不正確!!')
+                //     }
+
+                // } else {
+                //     if (response.status >= 500) {
+                //         console.log('伺服器發生錯誤!!')
+                //     } else if (response.status >= 400) {
+                //         console.log('呼叫錯誤!!')
+                //     } else {
+                //         console.log('請聯絡客服!!')
+                //     }
+                //     console.log('status：', response.status);
+                // }
+
+            } catch (error) {
+                // console.log(error);
+                if (signal.aborted) { //true 表示取消了
+                    divInfo.textContent = error;
+                } else {
+                    divInfo.textContent = error.message;
+                }
+
+            } finally {
+                console.log('請求結束!!')
+                imgLoader.style.display = 'none' //隱藏執行中的圖示
+                btnStart.disabled = false //啟用按鈕功能
+                clearTimeout(timer); //清除計時的功能
+            }
+        })
+
+        btnEnd.addEventListener('click', () => {
+            if (abortController) {
+                abortController.abort('您停止了程式的執行'); //取消 fetch() 的執行
+            }
+
+
+        })
+        // btnStart.addEventListener('click', () => {
+        //     const apiUrl = 'http://127.0.0.1:5000/api/hello'
+        //     // console.log(fetch(apiUrl));
+        //     fetch(apiUrl)
+        //         .then(res => {
+        //             // console.log(res);
+        //             // console.log(res.headers.get('content-Type'));
+        //             // console.log(res.headers.get('content-Length'));
+        //             // console.log(res.status);
+        //             // console.log(res.ok);
+        //             // console.log(res);
+        //             // console.log(res.body);
+        //             // console.log(res.json());  // 讀取 body 中 json 格式的資料，回傳的又是一個promise物件
+        //             return res.json();
+        //         })
+        //         .then(data => {
+        //             // console.log(data);
+        //             // divInfo.textContent = JSON.stringify(data) //JSON物件轉成JSON字串
+        //             divInfo.textContent = data.message;
+        //         })
+        // })
 
     </script>
 </body>
