@@ -5,6 +5,7 @@ from routes.page import page_bp
 from routes.api import api_bp
 from models import db # 從 models/__init__.py 匯入 db 物件
 import os
+from models_loader import init_all_models
 
 # 建立 Flask 物件
 app = Flask(__name__)
@@ -16,7 +17,8 @@ CORS(app)
 #將 Flask 應用程式轉成 RESTful API 的架構
 api = Api(app)  
 
-
+#載入模型
+init_all_models()
 
 # 設定資料庫
 basedir = os.path.abspath(os.path.dirname(__file__))
